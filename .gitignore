@@ -1,0 +1,20 @@
+# Archivos de backup de SQL
+*.bak
+*.trn
+
+# Archivos temporales
+*.tmp
+*.ldf
+*.mdf
+*.ndf
+
+# Archivos de SSMS
+*.ssmssln
+*.ssmsproject
+*.ssmssqlproj
+
+# Logs
+*.log
+
+# Archivos personales
+*.user

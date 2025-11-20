@@ -1,0 +1,30 @@
+use [SICORE]
+go
+
+-- =============================================
+-- Author:		Álvaro Zamora Solís
+-- Create date: Septiembre 2024
+-- Description:	Trae todos los registros de los nombres de las actividad de los clientes.
+-- =============================================
+
+IF EXISTS(SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[PA_CLIENTE_ACTIVIDAD_TRAE_LISTADO]') and objectproperty(id, N'IsProcedure') = 1)
+	DROP PROCEDURE [dbo].[PA_CLIENTE_ACTIVIDAD_TRAE_LISTADO]
+GO
+
+CREATE PROCEDURE [dbo].[PA_CLIENTE_ACTIVIDAD_TRAE_LISTADO]
+AS
+BEGIN TRY
+	BEGIN TRAN
+
+		select
+			idActividadComercial,
+			actividadCormercial actividadComercial
+		from
+			SICORE_ACTIVIDAD_COMERCIAL
+
+	COMMIT
+END TRY
+BEGIN CATCH
+	SELECT ERROR_MESSAGE()
+	ROLLBACK TRANSACTION TPROCESO
+END CATCH
