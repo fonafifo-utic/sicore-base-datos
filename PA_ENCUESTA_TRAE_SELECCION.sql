@@ -1,5 +1,5 @@
-use [SICORE]
-go
+USE [SICORE]
+GO
 
 -- =============================================
 -- Author:		Álvaro Zamora Solís
@@ -14,24 +14,25 @@ GO
 CREATE PROCEDURE [dbo].[PA_ENCUESTA_TRAE_SELECCION]
 AS
 BEGIN TRY
-	BEGIN TRAN
 
-		select
-			pregunta,
+		DECLARE @primerDiaAnno AS DATE = DATEFROMPARTS(YEAR(GETDATE()), 1, 1);
+		DECLARE @hoyEnDia AS DATE = CAST(GETDATE() AS DATE);
+			
+		SELECT
+			pregunta pregunta,
 			respuesta,
 			count(idReporte) conteo
-		from
+		FROM
 			SICORE_ENCUESTA_REPORTE
-		where
+		WHERE
 			tipoPregunta = 'S'
-		group by
+		AND
+			CAST(fechaHoraRespuesta AS DATE) BETWEEN @primerDiaAnno AND @hoyEnDia
+		GROUP BY
 			pregunta,
 			respuesta
 		
-	COMMIT
 END TRY
 BEGIN CATCH
 	SELECT ERROR_MESSAGE();
-
-	ROLLBACK TRAN
 END CATCH

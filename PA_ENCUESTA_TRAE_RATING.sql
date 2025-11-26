@@ -1,5 +1,5 @@
-use [SICORE]
-go
+USE [SICORE]
+GO
 
 -- =============================================
 -- Author:		Álvaro Zamora Solís
@@ -14,40 +14,41 @@ GO
 CREATE PROCEDURE [dbo].[PA_ENCUESTA_TRAE_RATING]
 AS
 BEGIN TRY
-	BEGIN TRAN
 
-		declare @tablaTemporalRating as table (
-			pregunta varchar(255),
-			valor int,
-			conteo int
-		)
+	DECLARE @primerDiaAnno AS DATE = DATEFROMPARTS(YEAR(GETDATE()), 1, 1);
+	DECLARE @hoyEnDia AS DATE = CAST(GETDATE() AS DATE);
 
-		insert into @tablaTemporalRating
-		select
-			pregunta,
-			valor,
-			count(idReporte)
-		from
-			SICORE_ENCUESTA_REPORTE
-		where
-			tipoPregunta = 'E'
-		group by
-			pregunta,
-			valor
+	DECLARE @tablaTemporalRating AS TABLE (
+		pregunta VARCHAR(255),
+		valor INT,
+		conteo INT
+	);
 
-		select distinct
-			rating.conteo,
-			rating.pregunta,
-			respuesta.respuestaOpcion respuesta
-		from
-			@tablaTemporalRating rating
-		inner join
-			SICORE_ENCUESTA_RESPUESTA respuesta on rating.valor = respuesta.valorRespuesta
+	INSERT INTO @tablaTemporalRating
+	SELECT
+		pregunta,
+		valor,
+		count(idReporte)
+	FROM
+		SICORE_ENCUESTA_REPORTE
+	WHERE
+		tipoPregunta = 'E'
+	AND
+		CAST(fechaHoraRespuesta AS DATE) BETWEEN @primerDiaAnno AND @hoyEnDia
+	GROUP BY
+		pregunta,
+		valor
+
+	SELECT DISTINCT
+		rating.conteo,
+		rating.pregunta,
+		respuesta.respuestaOpcion respuesta
+	FROM
+		@tablaTemporalRating rating
+	INNER JOIN
+		SICORE_ENCUESTA_RESPUESTA respuesta on rating.valor = respuesta.valorRespuesta
 		
-	COMMIT
 END TRY
 BEGIN CATCH
 	SELECT ERROR_MESSAGE();
-
-	ROLLBACK TRAN
 END CATCH
